@@ -1,0 +1,21 @@
+# Python virtual environment
+venv/
+__pycache__/
+*.py[cod]
+
+# Pytest
+.pytest_cache/
+
+# Environment variables and secrets
+.env
+
+# Terraform
+.terraform/
+*.tfstate
+*.tfstate.*
+*.tfvars
+*.tfplan
+
+# Python coverage
+.coverage
+htmlcov/
