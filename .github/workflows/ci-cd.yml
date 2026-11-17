@@ -54,3 +54,39 @@ jobs:
 
       - name: Validate Terraform
         run: terraform validate
+
+  docker-build:
+    name: Build and Test Docker Image
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Build Docker image
+        run: docker build -t eliteoperation-fintech:ci .
+
+      - name: Run Docker container
+        run: docker run -d --name fintech-api-test -p 5000:5000 eliteoperation-fintech:ci
+
+      - name: Test API endpoints
+        run: |
+          for attempt in {1..10}; do
+            if curl --fail http://localhost:5000/health; then
+              break
+            fi
+            sleep 2
+          done
+
+          curl --fail http://localhost:5000/
+          curl --fail http://localhost:5000/health
+
+      - name: Show container logs if tests fail
+        if: failure()
+        run: docker logs fintech-api-test
+
+      - name: Stop and remove container
+        if: always()
+        run: |
+          docker stop fintech-api-test || true
+          docker rm fintech-api-test || true
